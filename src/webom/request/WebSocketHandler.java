@@ -1,0 +1,36 @@
+package webom.request;
+
+import java.io.IOException;
+
+import org.eclipse.jetty.websocket.api.RemoteEndpoint;
+import org.eclipse.jetty.websocket.api.Session;
+
+public abstract class WebSocketHandler extends POJOBuilder {
+	Session session;
+	RemoteEndpoint client;
+
+	// TODO: Change it to setSession something
+	public void setSession(Session session) {
+		this.session = session;
+		this.client = session.getRemote();
+	}
+
+	public abstract void onWebSocketBinary(byte[] payload, int offset, int len);
+
+	public abstract void onWebSocketClose(int statusCode, String reason);
+
+	public abstract void onWebSocketConnect();
+
+	public abstract void onWebSocketError(Throwable cause);
+
+	public abstract void onWebSocketText(String message);
+
+	public void send(String str) {
+		try {
+			client.sendString(str);
+		} catch (IOException ex) {
+			ex.printStackTrace();
+		}
+	}
+
+}
