@@ -88,10 +88,10 @@ server.start();
 ## TODO:
 
   - Allow file uploads to temporary directory and size restrictions
-  - Decide session implementation
   - More validation rules, regex es etc.
   - Implement FileSession and RedisSession 
   - Better documentation
+  - Redirections
   
   
 If you have anything to share you can do it via opening an issue or shooting me an e-mail at mustafa91@gmail.com

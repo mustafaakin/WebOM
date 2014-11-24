@@ -29,7 +29,16 @@ import webom.session.SessionBackend;
 
 public class WebOM {
 	private static Logger logger = LoggerFactory.getLogger(WebOM.class);
+	private boolean productionMode = false;
+	
+	public void setProductionMode(boolean productionMode) {
+		this.productionMode = productionMode;
+	}
 
+	public boolean isProductionMode(){
+		return productionMode;
+	}
+	
 	HashMap<String, HashMap<Integer, ArrayList<Route>>> routes = new HashMap<>();
 
 	private int port;
