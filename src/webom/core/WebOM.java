@@ -11,6 +11,7 @@ import org.eclipse.jetty.server.HttpConnectionFactory;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.handler.HandlerCollection;
+import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.eclipse.jetty.websocket.server.WebSocketHandler;
 import org.eclipse.jetty.websocket.servlet.ServletUpgradeRequest;
 import org.eclipse.jetty.websocket.servlet.ServletUpgradeResponse;
@@ -24,7 +25,7 @@ import webom.annotations.request.Handler;
 import webom.annotations.request.RequestMethod;
 import webom.response.transform.StaticFileHandler;
 import webom.session.InMemorySession;
-import webom.session.SessionMiddleware;
+import webom.session.SessionBackend;
 
 public class WebOM {
 	private static Logger logger = LoggerFactory.getLogger(WebOM.class);
@@ -33,13 +34,13 @@ public class WebOM {
 
 	private int port;
 	private StaticFileHandler staticFileHandler;
-	private SessionMiddleware session = new InMemorySession();
+	private SessionBackend session = new InMemorySession();
 
-	public SessionMiddleware getSession() {
+	public SessionBackend getSessionBackend() {
 		return session;
 	}
 
-	public void setSession(SessionMiddleware session) {
+	public void setSession(SessionBackend session) {
 		this.session = session;
 	}
 

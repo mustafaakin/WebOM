@@ -18,7 +18,7 @@ import webom.session.Session;
 
 public abstract class POJOBuilder {
 	private Logger logger = LoggerFactory.getLogger(POJOBuilder.class);
-	
+
 	private HashMap<String, ArrayList<String>> validation_messages = new HashMap<String, ArrayList<String>>();
 
 	private void addMessage(String fieldName, String message, Object actualValue) {
@@ -32,7 +32,7 @@ public abstract class POJOBuilder {
 	private boolean putURLParam(Map<String, String> urlParams, String name, Field field) {
 		String value = urlParams.get(name);
 		if (value != null) {
-			return putToField(field, value);
+			return putStringToField(field, value);
 		}
 		return false;
 	}
@@ -41,7 +41,7 @@ public abstract class POJOBuilder {
 		String[] values = queryMap.get(name);
 		if (values != null) {
 			if (values.length == 1) {
-				return putToField(field, values[0]);
+				return putStringToField(field, values[0]);
 			} else {
 				// TODO: Handle later, get class check if list etc
 				return false;
@@ -54,13 +54,28 @@ public abstract class POJOBuilder {
 		List<String> values = queryMap.get(name);
 		if (values != null) {
 			if (values.size() == 1) {
-				return putToField(field, values.get(0));
+				return putStringToField(field, values.get(0));
 			} else {
+				logger.warn("The array values in putGETPOST are not implemented!");
 				// TODO: Handle later, get class check if list etc
 				return false;
 			}
 		}
 		return false;
+	}
+
+	private boolean putSession(Session session, String name, Field field) {
+		Object storedObj = session.get(name);
+		if (storedObj == null) {
+			return false;
+		}
+		try {
+			field.set(this, storedObj);
+		} catch (IllegalArgumentException | IllegalAccessException e) {
+			e.printStackTrace();
+			return false;
+		}
+		return true;
 	}
 
 	public void buildWebsocket(Map<String, String> urlParams, Map<String, List<String>> queryMap, Session session) {
@@ -85,8 +100,7 @@ public abstract class POJOBuilder {
 			if (param.type() == Type.URL) {
 				putURLParam(urlParams, name, field);
 			} else if (param.type() == Type.SESSION) {
-				logger.error("Session putting not implemented yet");
-				// TODO: Handle later
+				putSession(session, name, field);
 			} else if (param.type() == Type.GETPOST) {
 				putGETPOSTParamList(queryMap, name, field);
 			} else if (param.type() == Type.JSONBODY) {
@@ -98,11 +112,12 @@ public abstract class POJOBuilder {
 				// 2- Session parameters
 				// 3- GET/POST parameters
 				// 4- JSONBody parameters
-				boolean couldPut = putURLParam(urlParams, name, field) || putGETPOSTParamList(queryMap, name, field);				
+				boolean couldPut = putURLParam(urlParams, name, field) || putSession(session, name, field)
+						|| putGETPOSTParamList(queryMap, name, field);
 			}
 		}
 	}
-	
+
 	public void buildHTTP(Map<String, String> urlParams, Map<String, String[]> queryMap, Session session) {
 		Class<?> cls = this.getClass();
 
@@ -122,12 +137,11 @@ public abstract class POJOBuilder {
 			} else {
 				name = param.name();
 			}
-
+			
 			if (param.type() == Type.URL) {
 				putURLParam(urlParams, name, field);
 			} else if (param.type() == Type.SESSION) {
-				logger.error("Session putting not implemented yet");
-				// TODO: Handle later
+				putSession(session, name, field);
 			} else if (param.type() == Type.GETPOST) {
 				putGETPOSTParam(queryMap, name, field);
 			} else if (param.type() == Type.JSONBODY) {
@@ -139,7 +153,8 @@ public abstract class POJOBuilder {
 				// 2- Session parameters
 				// 3- GET/POST parameters
 				// 4- JSONBody parameters
-				boolean couldPut = putURLParam(urlParams, name, field) || putGETPOSTParam(queryMap, name, field);				
+				boolean couldPut = putURLParam(urlParams, name, field) || putSession(session, name, field)
+						|| putGETPOSTParam(queryMap, name, field);
 			}
 		}
 	}
@@ -208,7 +223,7 @@ public abstract class POJOBuilder {
 		return validation_messages.size() == 0;
 	}
 
-	private boolean putToField(Field field, String value) {
+	private boolean putStringToField(Field field, String value) {
 		try {
 			Class<?> fieldCls = field.getType();
 			if (fieldCls.equals(String.class)) {

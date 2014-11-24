@@ -10,9 +10,9 @@ _This project is still Work in progress, any suggestions are welcome and using i
 ### Intialization
 
 ```java
-		WebOM server = new WebOM(5000, "webom.examples");
-		server.setStaticFileLocation("public");
-		server.start();
+WebOM server = new WebOM(5000, "webom.examples");
+server.setStaticFileLocation("public");
+server.start();
 ```
 
 ### Just plain sample request handler

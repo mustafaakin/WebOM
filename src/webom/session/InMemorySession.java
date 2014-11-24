@@ -2,7 +2,12 @@ package webom.session;
 
 import java.util.HashMap;
 
-public class InMemorySession implements SessionMiddleware {
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public class InMemorySession implements SessionBackend {
+	final static Logger logger = LoggerFactory.getLogger(InMemorySession.class);
+	
 	HashMap<String, Session> map = new HashMap<>();
 
 	@Override
@@ -13,5 +18,10 @@ public class InMemorySession implements SessionMiddleware {
 	@Override
 	public void set(Session session) {
 		map.put(session.getKey(), session);
+	}
+
+	@Override
+	public void destroy(Session session) {
+		map.remove(session.getKey());		
 	}
 }

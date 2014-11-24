@@ -12,15 +12,19 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.AbstractHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import webom.request.HTTPRequestHandler;
 import webom.response.transform.FileTransformer;
 import webom.response.transform.StaticFileHandler;
 import webom.response.transform.StringTransformer;
 import webom.session.Session;
+import webom.session.SessionBackend;
 import webom.util.HTTPStatus;
 
 public class MainHTTPHandler extends AbstractHandler {
+	private static final Logger logger = LoggerFactory.getLogger(MainHTTPHandler.class);
 	private WebOM w;
 
 	// TODO: Anyone has a better idea than this, instead of writing singletons
@@ -52,9 +56,9 @@ public class MainHTTPHandler extends AbstractHandler {
 				return;
 			}
 		}
-		
+
 		// HTTP Cross origin, cors, csrf etc
-		
+
 		Route route = w.findMatchingRoute(target, baseRequest.getMethod());
 		if (route == null) {
 			response.setStatus(HTTPStatus.NOT_FOUND);
@@ -62,7 +66,6 @@ public class MainHTTPHandler extends AbstractHandler {
 			// Find out the class of the handler which should be a request
 			// handler
 			Class<?> routeCls = route.requestHandlerCls;
-			System.out.printf("%s ==> %s (%s) \n", target, route.path, routeCls);
 
 			// Get the parameters in URL
 			Map<String, String> urlParams = route.matches(target);
@@ -80,9 +83,11 @@ public class MainHTTPHandler extends AbstractHandler {
 					}
 				}
 
-				Session session = w.getSession().get(sessionKey);
+				SessionBackend sessionBackend = w.getSessionBackend();
+				Session session = sessionBackend.get(sessionKey);
+
 				if (session == null) {
-					session = new Session();
+					session = new Session(sessionBackend);
 					sessionKey = session.getKey();
 					Cookie cookie = new Cookie(SESSION_HEADER_NAME, sessionKey);
 					response.addCookie(cookie);
@@ -117,14 +122,14 @@ public class MainHTTPHandler extends AbstractHandler {
 					// TODO: WHAT ABOUT CONTENT LENGTH? What is crucial?
 
 					// TODO: Gzip on large things
-					
+
 					// Do the transmissions based on the returned object type
-					if (result instanceof String) {						
+					if (result instanceof String) {
 						stringTransformer.transform(req, res, (String) result);
 					} else if (result instanceof File) {
-						// Do magic
+						fileTransformer.transform(req, res, (File) result);
 					} else if (result instanceof InputStream) {
-
+						
 					} else if (result instanceof Object) {
 						// WTF Then?
 					} else {
@@ -132,7 +137,9 @@ public class MainHTTPHandler extends AbstractHandler {
 					}
 				}
 
-				w.getSession().set(session);
+				// If it is not modified, it is up to SessionBackend to decide
+				// if actually update or leave it as it is
+				session.save();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
