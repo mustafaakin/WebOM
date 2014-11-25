@@ -65,6 +65,9 @@ public abstract class POJOBuilder {
 	}
 
 	private boolean putSession(Session session, String name, Field field) {
+		// TODO: just to be safe, is it right choice
+		if ( session == null)
+			return false;
 		Object storedObj = session.get(name);
 		if (storedObj == null) {
 			return false;

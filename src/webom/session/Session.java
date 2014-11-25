@@ -1,17 +1,23 @@
 package webom.session;
 
+import java.io.IOException;
 import java.util.HashMap;
-import java.util.Map.Entry;
-import java.util.Set;
 import java.util.UUID;
 
-import com.google.gson.Gson;
+import com.cedarsoftware.util.io.JsonReader;
+import com.cedarsoftware.util.io.JsonWriter;
 
 public class Session {
 	private String key;
 	private boolean destoryCalled = false;
 	private SessionBackend backend;
 
+	public void setMap(HashMap<String, Object> map) {
+		if ( map != null){
+			this.map = map;			
+		}
+	}
+	
 	private HashMap<String, Object> map = new HashMap<>();
 
 	public Session(String key, SessionBackend backend) {
@@ -41,28 +47,35 @@ public class Session {
 		return map.get(key);
 	}
 
-	public void put(String key, Object object){
+	public void put(String key, Object object) {
 		map.put(key, object);
 	}
 
-	public boolean fromJSON(String str) {
-		Gson gson = new Gson();
-		HashMap<String, Object> map = (HashMap<String, Object>) gson.fromJson(str, HashMap.class);
-		if (map != null) {
-			this.map = map;
-			return true;
-		} else {
-			return false;
-		}
+	public void fromJSON(String str) {
+		try {
+			Object obj = JsonReader.jsonToJava(str);
+			map = (HashMap<String, Object>) obj;
+		} catch (IOException e) {
+			e.printStackTrace();
+		}		
 	}
-	
-	public void save(){
+
+	public void save() {
 		backend.set(this);
 	}
-	
+
+	public HashMap<String, Object> getMap() {
+		return map;
+	}
+
 	// Use if desired
-	public String toJSON(){
-		Gson gson = new Gson();
-		return gson.toJson(map);
+	public String toJSON() {
+		String str = null;
+		try {
+			str = JsonWriter.objectToJson(map);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return str;
 	}
 }

@@ -95,13 +95,22 @@ public class MainHTTPHandler extends AbstractHandler {
 				}
 
 				SessionBackend sessionBackend = webom.getSessionBackend();
-				Session session = sessionBackend.get(sessionKey);
+				Session session;
 
-				if (session == null) {
+				// TODO: Make it more beautiful, remove duplicacity
+				if (sessionKey == null) {
 					session = new Session(sessionBackend);
 					sessionKey = session.getKey();
 					Cookie cookie = new Cookie(SESSION_HEADER_NAME, sessionKey);
 					response.addCookie(cookie);
+				} else {
+					session = sessionBackend.get(sessionKey);
+					if ( session == null){
+						session = new Session(sessionBackend);
+						sessionKey = session.getKey();
+						Cookie cookie = new Cookie(SESSION_HEADER_NAME, sessionKey);
+						response.addCookie(cookie);						
+					}
 				}
 
 				// Instantiate the given class and build the object to
@@ -177,6 +186,8 @@ public class MainHTTPHandler extends AbstractHandler {
 				output.println("\n\n ** You can disable this message by setting the WebOM in production mode.");
 			}
 
+			ex.printStackTrace();
+			
 			long endTime = System.nanoTime();
 			double diff = (endTime / 1000000.0 - startTime / 1000000.0);
 			// Better error reporting
