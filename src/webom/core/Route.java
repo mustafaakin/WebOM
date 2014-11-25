@@ -31,6 +31,7 @@ public class Route {
 		}
 		return filtered;
 	}
+
 	public String path;
 	public String[] components;
 	public boolean[] parametric;

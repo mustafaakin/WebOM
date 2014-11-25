@@ -9,12 +9,6 @@ public abstract class WebSocketHandler extends POJOBuilder {
 	Session session;
 	RemoteEndpoint client;
 
-	// TODO: Change it to setSession something
-	public void setSession(Session session) {
-		this.session = session;
-		this.client = session.getRemote();
-	}
-
 	public abstract void onWebSocketBinary(byte[] payload, int offset, int len);
 
 	public abstract void onWebSocketClose(int statusCode, String reason);
@@ -31,6 +25,12 @@ public abstract class WebSocketHandler extends POJOBuilder {
 		} catch (IOException ex) {
 			ex.printStackTrace();
 		}
+	}
+
+	// TODO: Change it to setSession something
+	public void setSession(Session session) {
+		this.session = session;
+		this.client = session.getRemote();
 	}
 
 }

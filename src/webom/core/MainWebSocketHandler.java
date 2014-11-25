@@ -20,10 +20,6 @@ public class MainWebSocketHandler implements WebSocketListener {
 
 	}
 
-	public void setWebom(WebOM w) {
-		this.w = w;
-	}
-
 	@Override
 	public void onWebSocketBinary(byte[] payload, int offset, int len) {
 		if (handler != null) {
@@ -66,7 +62,7 @@ public class MainWebSocketHandler implements WebSocketListener {
 
 				// TODO: Also Get the session params
 				handler.buildWebsocket(urlParams, queryMap, null);
-				
+
 				handler.onWebSocketConnect();
 			} catch (Exception ex) {
 				ex.printStackTrace();
@@ -87,6 +83,10 @@ public class MainWebSocketHandler implements WebSocketListener {
 		if (handler != null) {
 			handler.onWebSocketText(message);
 		}
+	}
+
+	public void setWebom(WebOM w) {
+		this.w = w;
 	}
 
 }

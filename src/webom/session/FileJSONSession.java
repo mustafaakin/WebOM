@@ -1,12 +1,6 @@
 package webom.session;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.util.HashMap;
 
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
@@ -28,6 +22,16 @@ public class FileJSONSession implements SessionBackend {
 	}
 
 	@Override
+	public void destroy(Session session) {
+		File file = getFile(session.getKey());
+		try {
+			file.delete();
+		} catch (Exception ex) {
+			logger.error("Could not delete session {} , error: {}", session.getKey(), ex.getMessage());
+		}
+	}
+
+	@Override
 	public Session get(String key) {
 		File file = getFile(key);
 		try {
@@ -44,6 +48,10 @@ public class FileJSONSession implements SessionBackend {
 		}
 	}
 
+	private File getFile(String key) {
+		return new File(path, key);
+	}
+
 	@Override
 	public void set(Session session) {
 		File file = getFile(session.getKey());
@@ -52,19 +60,5 @@ public class FileJSONSession implements SessionBackend {
 		} catch (Exception e) {
 			logger.error("Could not write session {} to file, error: {}", session.getKey(), e.getMessage());
 		}
-	}
-
-	@Override
-	public void destroy(Session session) {
-		File file = getFile(session.getKey());
-		try {
-			file.delete();
-		} catch (Exception ex) {
-			logger.error("Could not delete session {} , error: {}", session.getKey(), ex.getMessage());
-		}
-	}
-
-	private File getFile(String key) {
-		return new File(path, key);
 	}
 }

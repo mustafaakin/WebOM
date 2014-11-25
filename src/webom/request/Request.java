@@ -23,10 +23,6 @@ public class Request {
 		this.raw = raw;
 	}
 
-	public Session getSession() {
-		return session;
-	}
-
 	public int getContentLength() {
 		return contentLength;
 	}
@@ -49,6 +45,10 @@ public class Request {
 
 	public String getReferrer() {
 		return referrer;
+	}
+
+	public Session getSession() {
+		return session;
 	}
 
 	public void setContentLength(int contentLength) {

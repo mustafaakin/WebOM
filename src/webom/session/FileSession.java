@@ -27,18 +27,28 @@ public class FileSession implements SessionBackend {
 	}
 
 	@Override
+	public void destroy(Session session) {
+		File file = getFile(session.getKey());
+		try {
+			file.delete();
+		} catch (Exception ex) {
+			logger.error("Could not delete session {} , error: {}", session.getKey(), ex.getMessage());
+		}
+	}
+
+	@Override
 	public Session get(String key) {
 		File file = getFile(key);
 		try {
 			Session session = new Session(key, this);
-			if ( !file.exists()){
+			if (!file.exists()) {
 				return session;
 			}
-			
+
 			FileInputStream fileIn = new FileInputStream(file);
 			ObjectInputStream in = new ObjectInputStream(fileIn);
-			
-			Object readObj = in.readObject();			
+
+			Object readObj = in.readObject();
 			session.setMap((HashMap<String, Object>) readObj);
 			in.close();
 			return session;
@@ -46,6 +56,10 @@ public class FileSession implements SessionBackend {
 			ex.printStackTrace();
 			return null;
 		}
+	}
+
+	private File getFile(String key) {
+		return new File(path, key);
 	}
 
 	@Override
@@ -59,19 +73,5 @@ public class FileSession implements SessionBackend {
 		} catch (IOException e) {
 			logger.error("Could not write session {} to file, error: {}", session.getKey(), e.getMessage());
 		}
-	}
-
-	@Override
-	public void destroy(Session session) {
-		File file = getFile(session.getKey());
-		try {
-			file.delete();
-		} catch (Exception ex) {
-			logger.error("Could not delete session {} , error: {}", session.getKey(), ex.getMessage());
-		}
-	}
-
-	private File getFile(String key) {
-		return new File(path, key);
 	}
 }

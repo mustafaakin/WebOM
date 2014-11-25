@@ -7,8 +7,13 @@ import org.slf4j.LoggerFactory;
 
 public class InMemorySession implements SessionBackend {
 	final static Logger logger = LoggerFactory.getLogger(InMemorySession.class);
-	
+
 	HashMap<String, Session> map = new HashMap<>();
+
+	@Override
+	public void destroy(Session session) {
+		map.remove(session.getKey());
+	}
 
 	@Override
 	public Session get(String sessionKey) {
@@ -18,10 +23,5 @@ public class InMemorySession implements SessionBackend {
 	@Override
 	public void set(Session session) {
 		map.put(session.getKey(), session);
-	}
-
-	@Override
-	public void destroy(Session session) {
-		map.remove(session.getKey());		
 	}
 }

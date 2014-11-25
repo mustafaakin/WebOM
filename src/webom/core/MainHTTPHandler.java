@@ -105,11 +105,11 @@ public class MainHTTPHandler extends AbstractHandler {
 					response.addCookie(cookie);
 				} else {
 					session = sessionBackend.get(sessionKey);
-					if ( session == null){
+					if (session == null) {
 						session = new Session(sessionBackend);
 						sessionKey = session.getKey();
 						Cookie cookie = new Cookie(SESSION_HEADER_NAME, sessionKey);
-						response.addCookie(cookie);						
+						response.addCookie(cookie);
 					}
 				}
 
@@ -187,7 +187,7 @@ public class MainHTTPHandler extends AbstractHandler {
 			}
 
 			ex.printStackTrace();
-			
+
 			long endTime = System.nanoTime();
 			double diff = (endTime / 1000000.0 - startTime / 1000000.0);
 			// Better error reporting

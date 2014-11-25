@@ -11,7 +11,7 @@ import webom.session.Session;
 
 @Handler(method = RequestMethod.GET, path = "/sessionTest")
 public class SessionExample extends HTTPRequestHandler {
-	@Param(type=Type.SESSION)
+	@Param(type = Type.SESSION)
 	public int visitCount = 0;
 
 	@Override

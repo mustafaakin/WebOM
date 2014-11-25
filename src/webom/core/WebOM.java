@@ -11,7 +11,6 @@ import org.eclipse.jetty.server.HttpConnectionFactory;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.handler.HandlerCollection;
-import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.eclipse.jetty.websocket.server.WebSocketHandler;
 import org.eclipse.jetty.websocket.servlet.ServletUpgradeRequest;
 import org.eclipse.jetty.websocket.servlet.ServletUpgradeResponse;
@@ -30,29 +29,14 @@ import webom.session.SessionBackend;
 public class WebOM {
 	private static Logger logger = LoggerFactory.getLogger(WebOM.class);
 	private boolean productionMode = false;
-	
-	public void setProductionMode(boolean productionMode) {
-		this.productionMode = productionMode;
-	}
 
-	public boolean isProductionMode(){
-		return productionMode;
-	}
-	
 	HashMap<String, HashMap<Integer, ArrayList<Route>>> routes = new HashMap<>();
 
 	private int port;
+
 	private StaticFileHandler staticFileHandler;
+
 	private SessionBackend session = new InMemorySession();
-
-	public SessionBackend getSessionBackend() {
-		return session;
-	}
-
-	public void setSession(SessionBackend session) {
-		this.session = session;
-	}
-
 	public WebOM(int port, String packageName) {
 		this.port = port;
 
@@ -66,7 +50,6 @@ public class WebOM {
 			this.addRoute(path, method.str, cls);
 		}
 	}
-
 	public void addRoute(String path, String method, Class<?> cls) {
 		logger.info("Mapping route {} {}, ({})", method, path, cls.getName());
 		String[] pathComponents = Route.getComponentsFromPath(path);
@@ -112,8 +95,24 @@ public class WebOM {
 		return matchedRoute;
 	}
 
+	public SessionBackend getSessionBackend() {
+		return session;
+	}
+
 	public StaticFileHandler getStaticFileHandler() {
 		return staticFileHandler;
+	}
+
+	public boolean isProductionMode() {
+		return productionMode;
+	}
+
+	public void setProductionMode(boolean productionMode) {
+		this.productionMode = productionMode;
+	}
+
+	public void setSession(SessionBackend session) {
+		this.session = session;
 	}
 
 	public void setStaticFileLocation(String path) {
@@ -127,7 +126,7 @@ public class WebOM {
 		MainHTTPHandler http = new MainHTTPHandler(this);
 		handlerCollection.addHandler(http);
 
-		final WebOM w = this;		
+		final WebOM w = this;
 		// Initialize Main Web Socket handler that will respond to anything
 		WebSocketHandler wsHandler = new WebSocketHandler() {
 			@Override
@@ -135,22 +134,22 @@ public class WebOM {
 				factory.register(MainWebSocketHandler.class);
 
 				final WebSocketCreator creator = factory.getCreator();
-				factory.setCreator(new WebSocketCreator() {					
+				factory.setCreator(new WebSocketCreator() {
 					@Override
 					public Object createWebSocket(ServletUpgradeRequest req, ServletUpgradeResponse resp) {
-			            Object webSocket = creator.createWebSocket(req, resp);		            
-						if (webSocket instanceof MainWebSocketHandler){
+						Object webSocket = creator.createWebSocket(req, resp);
+						if (webSocket instanceof MainWebSocketHandler) {
 							MainWebSocketHandler mwsh = (MainWebSocketHandler) webSocket;
-							mwsh.setWebom(w);							
+							mwsh.setWebom(w);
 						}
-			            return webSocket;
+						return webSocket;
 					}
 				});
 			}
-			
+
 		};
 		handlerCollection.addHandler(wsHandler);
-		
+
 		try {
 			HttpConfiguration httpConfig = new HttpConfiguration();
 			httpConfig.setSendServerVersion(false);

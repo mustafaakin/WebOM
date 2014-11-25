@@ -11,7 +11,7 @@ import webom.request.WebSocketHandler;
 
 @Handler(method = RequestMethod.WEBSOCKET, path = "/terminal/:termId")
 public class TerminalHandler extends WebSocketHandler {
-		
+
 	private static Logger logger = LoggerFactory.getLogger(TerminalHandler.class);
 
 	@NotNull

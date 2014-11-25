@@ -29,56 +29,45 @@ public abstract class POJOBuilder {
 		fieldMessages.add(message + " , value: " + actualValue);
 	}
 
-	private boolean putURLParam(Map<String, String> urlParams, String name, Field field) {
-		String value = urlParams.get(name);
-		if (value != null) {
-			return putStringToField(field, value);
-		}
-		return false;
-	}
+	public void buildHTTP(Map<String, String> urlParams, Map<String, String[]> queryMap, Session session) {
+		Class<?> cls = this.getClass();
 
-	private boolean putGETPOSTParam(Map<String, String[]> queryMap, String name, Field field) {
-		String[] values = queryMap.get(name);
-		if (values != null) {
-			if (values.length == 1) {
-				return putStringToField(field, values[0]);
+		// Map to existing fields, therefore don't fail when there extra
+		// parameters arrives
+		Field[] fields = cls.getFields();
+
+		for (Field field : fields) {
+			Param param = field.getAnnotation(Param.class);
+			if (param == null) {
+				continue;
+			}
+
+			String name;
+			if (param.name().equals("")) {
+				name = field.getName();
 			} else {
-				// TODO: Handle later, get class check if list etc
-				return false;
+				name = param.name();
+			}
+
+			if (param.type() == Type.URL) {
+				putURLParam(urlParams, name, field);
+			} else if (param.type() == Type.SESSION) {
+				putSession(session, name, field);
+			} else if (param.type() == Type.GETPOST) {
+				putGETPOSTParam(queryMap, name, field);
+			} else if (param.type() == Type.JSONBODY) {
+				logger.error("JSONBody putting not implemented yet");
+			} else if (param.type() == Type.ANY) {
+				// The order should be preserved
+				// Order:
+				// 1- URL parameters
+				// 2- Session parameters
+				// 3- GET/POST parameters
+				// 4- JSONBody parameters
+				boolean couldPut = putURLParam(urlParams, name, field) || putSession(session, name, field)
+						|| putGETPOSTParam(queryMap, name, field);
 			}
 		}
-		return false;
-	}
-
-	private boolean putGETPOSTParamList(Map<String, List<String>> queryMap, String name, Field field) {
-		List<String> values = queryMap.get(name);
-		if (values != null) {
-			if (values.size() == 1) {
-				return putStringToField(field, values.get(0));
-			} else {
-				logger.warn("The array values in putGETPOST are not implemented!");
-				// TODO: Handle later, get class check if list etc
-				return false;
-			}
-		}
-		return false;
-	}
-
-	private boolean putSession(Session session, String name, Field field) {
-		// TODO: just to be safe, is it right choice
-		if ( session == null)
-			return false;
-		Object storedObj = session.get(name);
-		if (storedObj == null) {
-			return false;
-		}
-		try {
-			field.set(this, storedObj);
-		} catch (IllegalArgumentException | IllegalAccessException e) {
-			e.printStackTrace();
-			return false;
-		}
-		return true;
 	}
 
 	public void buildWebsocket(Map<String, String> urlParams, Map<String, List<String>> queryMap, Session session) {
@@ -117,47 +106,6 @@ public abstract class POJOBuilder {
 				// 4- JSONBody parameters
 				boolean couldPut = putURLParam(urlParams, name, field) || putSession(session, name, field)
 						|| putGETPOSTParamList(queryMap, name, field);
-			}
-		}
-	}
-
-	public void buildHTTP(Map<String, String> urlParams, Map<String, String[]> queryMap, Session session) {
-		Class<?> cls = this.getClass();
-
-		// Map to existing fields, therefore don't fail when there extra
-		// parameters arrives
-		Field[] fields = cls.getFields();
-
-		for (Field field : fields) {
-			Param param = field.getAnnotation(Param.class);
-			if (param == null) {
-				continue;
-			}
-
-			String name;
-			if (param.name().equals("")) {
-				name = field.getName();
-			} else {
-				name = param.name();
-			}
-			
-			if (param.type() == Type.URL) {
-				putURLParam(urlParams, name, field);
-			} else if (param.type() == Type.SESSION) {
-				putSession(session, name, field);
-			} else if (param.type() == Type.GETPOST) {
-				putGETPOSTParam(queryMap, name, field);
-			} else if (param.type() == Type.JSONBODY) {
-				logger.error("JSONBody putting not implemented yet");
-			} else if (param.type() == Type.ANY) {
-				// The order should be preserved
-				// Order:
-				// 1- URL parameters
-				// 2- Session parameters
-				// 3- GET/POST parameters
-				// 4- JSONBody parameters
-				boolean couldPut = putURLParam(urlParams, name, field) || putSession(session, name, field)
-						|| putGETPOSTParam(queryMap, name, field);
 			}
 		}
 	}
@@ -226,6 +174,50 @@ public abstract class POJOBuilder {
 		return validation_messages.size() == 0;
 	}
 
+	private boolean putGETPOSTParam(Map<String, String[]> queryMap, String name, Field field) {
+		String[] values = queryMap.get(name);
+		if (values != null) {
+			if (values.length == 1) {
+				return putStringToField(field, values[0]);
+			} else {
+				// TODO: Handle later, get class check if list etc
+				return false;
+			}
+		}
+		return false;
+	}
+
+	private boolean putGETPOSTParamList(Map<String, List<String>> queryMap, String name, Field field) {
+		List<String> values = queryMap.get(name);
+		if (values != null) {
+			if (values.size() == 1) {
+				return putStringToField(field, values.get(0));
+			} else {
+				logger.warn("The array values in putGETPOST are not implemented!");
+				// TODO: Handle later, get class check if list etc
+				return false;
+			}
+		}
+		return false;
+	}
+
+	private boolean putSession(Session session, String name, Field field) {
+		// TODO: just to be safe, is it right choice
+		if (session == null)
+			return false;
+		Object storedObj = session.get(name);
+		if (storedObj == null) {
+			return false;
+		}
+		try {
+			field.set(this, storedObj);
+		} catch (IllegalArgumentException | IllegalAccessException e) {
+			e.printStackTrace();
+			return false;
+		}
+		return true;
+	}
+
 	private boolean putStringToField(Field field, String value) {
 		try {
 			Class<?> fieldCls = field.getType();
@@ -244,5 +236,13 @@ public abstract class POJOBuilder {
 			ex.printStackTrace();
 			return false;
 		}
+	}
+
+	private boolean putURLParam(Map<String, String> urlParams, String name, Field field) {
+		String value = urlParams.get(name);
+		if (value != null) {
+			return putStringToField(field, value);
+		}
+		return false;
 	}
 }

@@ -1,15 +1,6 @@
 package webom.response.transform;
 
-import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.nio.file.Files;
-
-import javax.servlet.http.HttpServletResponse;
-
-import org.apache.commons.io.IOUtils;
-
-import webom.util.HTTPStatus;
 
 public class StaticFileHandler {
 	// TODO: Hash mechanism for fast file lookups?
