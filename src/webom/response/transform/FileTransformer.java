@@ -6,6 +6,7 @@ import java.io.FileInputStream;
 import java.nio.file.Files;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.tika.Tika;
 
 import webom.request.Request;
 import webom.response.Response;
@@ -21,7 +22,9 @@ public class FileTransformer implements ResponseTransofmer<File> {
 
 			// Set the corresponding headers
 			response.getRaw().setContentLengthLong(file.length());
-			response.setContentType(Files.probeContentType(file.toPath()));
+			Tika tika = new Tika();
+			response.getRaw().setContentType(tika.detect(file.getPath()));
+			
 			response.setStatus(HTTPStatus.OK);
 
 			// Copy the file stream to servlet stream
