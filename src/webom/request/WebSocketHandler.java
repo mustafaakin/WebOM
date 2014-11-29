@@ -9,6 +9,14 @@ public abstract class WebSocketHandler extends POJOBuilder {
 	Session session;
 	RemoteEndpoint client;
 
+	public RemoteEndpoint getRemote(){
+		return session.getRemote();
+	}
+	
+	public Session getSession() {
+		return session;
+	}
+	
 	public abstract void onWebSocketBinary(byte[] payload, int offset, int len);
 
 	public abstract void onWebSocketClose(int statusCode, String reason);

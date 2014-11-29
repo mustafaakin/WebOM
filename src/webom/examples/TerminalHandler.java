@@ -32,6 +32,7 @@ public class TerminalHandler extends WebSocketHandler {
 	public void onWebSocketConnect() {
 		logger.info("Websocket connected");
 		send("Hello, it seems you want the terminal: " + termId);
+
 	}
 
 	@Override
