@@ -24,6 +24,8 @@ import webom.session.Session;
 import webom.session.SessionBackend;
 import webom.util.HTTPStatus;
 
+import com.google.gson.Gson;
+
 public class MainHTTPHandler extends AbstractHandler {
 	private static final Logger logger = LoggerFactory.getLogger(MainHTTPHandler.class);
 	private WebOM webom;
@@ -156,7 +158,9 @@ public class MainHTTPHandler extends AbstractHandler {
 					} else if (result instanceof InputStream) {
 
 					} else if (result instanceof Object) {
-						// WTF Then?
+						Gson gson = new Gson();
+						String jsonStr = gson.toJson(result);
+						stringTransformer.transform(req, res, jsonStr);
 					} else {
 						// Actually can never be here
 					}
