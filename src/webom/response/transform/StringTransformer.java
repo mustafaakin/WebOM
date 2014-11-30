@@ -2,6 +2,8 @@ package webom.response.transform;
 
 import java.io.IOException;
 
+import org.slf4j.LoggerFactory;
+
 import webom.request.Request;
 import webom.response.Response;
 

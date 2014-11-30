@@ -7,7 +7,7 @@ import webom.util.HTTPStatus;
 
 public class Response {
 	private int status = HTTPStatus.OK;
-	private String contentType = ContentType.TEXT;
+	private String contentType;
 
 	private HttpServletResponse raw;
 
