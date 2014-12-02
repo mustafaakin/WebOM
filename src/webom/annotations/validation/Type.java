@@ -1,5 +1,5 @@
 package webom.annotations.validation;
 
 public enum Type {
-	GETPOST, URL, ANY, SESSION, JSONBODY
+	GETPOST, URL, ANY, SESSION, JSON
 }

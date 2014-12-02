@@ -126,7 +126,7 @@ public class MainHTTPHandler extends AbstractHandler {
 				// Build the POJO Class field values from either URL
 				// parameters,
 				// or GET/POST variables
-				instance.buildHTTP(urlParams, req.getRaw().getParameterMap(), session);
+				instance.buildHTTP(urlParams, req.getRaw().getParameterMap(), session, request.getInputStream());
 
 				// Determine if the requirements are satisfied
 				boolean isValid = instance.isValid();

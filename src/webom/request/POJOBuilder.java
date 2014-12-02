@@ -1,11 +1,16 @@
 package webom.request;
 
+import java.io.InputStream;
+import java.io.StringWriter;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.io.IOUtils;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,6 +20,8 @@ import webom.annotations.validation.Param;
 import webom.annotations.validation.Range;
 import webom.annotations.validation.Type;
 import webom.session.Session;
+
+import com.google.gson.Gson;
 
 public abstract class POJOBuilder {
 	private Logger logger = LoggerFactory.getLogger(POJOBuilder.class);
@@ -29,12 +36,33 @@ public abstract class POJOBuilder {
 		fieldMessages.add(message + " , value: " + actualValue);
 	}
 
-	public void buildHTTP(Map<String, String> urlParams, Map<String, String[]> queryMap, Session session) {
+	public void buildHTTP(Map<String, String> urlParams, Map<String, String[]> queryMap, Session session,
+			InputStream body) {
 		Class<?> cls = this.getClass();
 
 		// Map to existing fields, therefore don't fail when there extra
 		// parameters arrives
+
 		Field[] fields = cls.getFields();
+
+		for (Field field : fields) {
+			Param param = field.getAnnotation(Param.class);
+			if (param == null) {
+				continue;
+			} else if (param.type() == Type.JSON) {
+				StringWriter str = new StringWriter();
+				try {
+					IOUtils.copy(body, str);
+					Class<?> fieldCls = field.getType();
+					Gson gson = new Gson();
+					logger.info(str.toString());
+					Object obj = gson.fromJson(str.toString(), fieldCls);
+					field.set(this, obj);
+				} catch (Exception ex) {
+					ex.printStackTrace();
+				}
+			}
+		}
 
 		for (Field field : fields) {
 			Param param = field.getAnnotation(Param.class);
@@ -55,18 +83,37 @@ public abstract class POJOBuilder {
 				putSession(session, name, field);
 			} else if (param.type() == Type.GETPOST) {
 				putGETPOSTParam(queryMap, name, field);
-			} else if (param.type() == Type.JSONBODY) {
-				logger.error("JSONBody putting not implemented yet");
 			} else if (param.type() == Type.ANY) {
 				// The order should be preserved
 				// Order:
 				// 1- URL parameters
 				// 2- Session parameters
 				// 3- GET/POST parameters
-				// 4- JSONBody parameters
 				boolean couldPut = putURLParam(urlParams, name, field) || putSession(session, name, field)
 						|| putGETPOSTParam(queryMap, name, field);
 			}
+		}
+	}
+
+	private void putJSONToField(JSONObject json, String name, Field field) {
+		Class<?> cls = field.getClass();
+		if (Collection.class.isAssignableFrom(cls)) {
+			throw new IllegalArgumentException("Not implemented yet");
+		} else {
+			try {
+				if (cls.equals(String.class)) {
+					field.set(this, json.getString(name));
+				} else if (cls.equals(Integer.class)) {
+					field.set(this, json.getInt(name));
+				} else if (cls.equals(Double.class)) {
+					field.set(this, json.getDouble(name));
+				} else {
+					throw new IllegalArgumentException("I just don't know how to put this class:" + cls.getName());
+				}
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
+			// Singular field
 		}
 	}
 
@@ -95,7 +142,7 @@ public abstract class POJOBuilder {
 				putSession(session, name, field);
 			} else if (param.type() == Type.GETPOST) {
 				putGETPOSTParamList(queryMap, name, field);
-			} else if (param.type() == Type.JSONBODY) {
+			} else if (param.type() == Type.JSON) {
 				logger.error("JSONBody putting not implemented yet");
 			} else if (param.type() == Type.ANY) {
 				// The order should be preserved
