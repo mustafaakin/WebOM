@@ -86,11 +86,13 @@ public class MainHTTPHandler extends AbstractHandler {
 
 				// TODO: Also build the session!!
 				Cookie[] cookies = request.getCookies();
+				Cookie foundCookie = null;
 				String sessionKey = null;
 				if (cookies != null) {
 					for (Cookie cookie : cookies) {
 						if (cookie.getName().equals(SESSION_HEADER_NAME)) {
 							sessionKey = cookie.getValue();
+							foundCookie = cookie;
 							break;
 						}
 					}
@@ -99,19 +101,23 @@ public class MainHTTPHandler extends AbstractHandler {
 				SessionBackend sessionBackend = webom.getSessionBackend();
 				Session session;
 
-				// TODO: Make it more beautiful, remove duplicacity
+				// TODO: Make it more beautiful, remove duplicated code
 				if (sessionKey == null) {
 					session = new Session(sessionBackend);
 					sessionKey = session.getKey();
 					Cookie cookie = new Cookie(SESSION_HEADER_NAME, sessionKey);
 					response.addCookie(cookie);
+					logger.info("Ssseion key not found, creating new one {} ", sessionKey);
 				} else {
+					logger.info("Ssseion key found {}", sessionKey);
 					session = sessionBackend.get(sessionKey);
 					if (session == null) {
 						session = new Session(sessionBackend);
 						sessionKey = session.getKey();
 						Cookie cookie = new Cookie(SESSION_HEADER_NAME, sessionKey);
+						foundCookie.setMaxAge(0);
 						response.addCookie(cookie);
+						logger.info("Ssseion id could not be found adding new key {}", sessionKey);
 					}
 				}
 
@@ -130,14 +136,22 @@ public class MainHTTPHandler extends AbstractHandler {
 
 				// Determine if the requirements are satisfied
 				boolean isValid = instance.isValid();
+
 				if (!isValid) {
 					res.getRaw().getWriter().println("The request is invalid:" + instance.getValidation_messages());
 					res.getRaw().setStatus(HTTPStatus.BAD_REQUEST);
 					// Don't attempt to handle the request
 				} else {
+					// Call the before;
+					Object beforeObj = instance.before();
 					// Call the handle method of the newly instantiated
 					// class
-					Object result = instance.handle(req, res);
+					Object result;
+					if (beforeObj != null) {
+						result = beforeObj;
+					} else {
+						result = instance.handle(req, res);
+					}
 
 					// Set the content type from given Response object,
 					// since
