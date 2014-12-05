@@ -17,11 +17,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import webom.request.HTTPRequestHandler;
+import webom.response.Message;
 import webom.response.transform.FileTransformer;
 import webom.response.transform.StaticFileHandler;
 import webom.response.transform.StringTransformer;
 import webom.session.Session;
 import webom.session.SessionBackend;
+import webom.util.ContentType;
 import webom.util.HTTPStatus;
 
 import com.google.gson.Gson;
@@ -60,8 +62,9 @@ public class MainHTTPHandler extends AbstractHandler {
 					long endTime = System.nanoTime();
 					double diff = (endTime / 1000000.0 - startTime / 1000000.0);
 
-					logger.info("{} {} {} {} ms", baseRequest.getMethod(), target, res.getRaw().getStatus(),
-							String.format("%.2f", diff));
+					// logger.info("{} {} {} {} ms", baseRequest.getMethod(),
+					// target, res.getRaw().getStatus(), String.format("%.2f",
+					// diff));
 					baseRequest.setHandled(true);
 					return;
 				}
@@ -107,9 +110,10 @@ public class MainHTTPHandler extends AbstractHandler {
 					sessionKey = session.getKey();
 					Cookie cookie = new Cookie(SESSION_HEADER_NAME, sessionKey);
 					response.addCookie(cookie);
-					logger.info("Ssseion key not found, creating new one {} ", sessionKey);
+					// logger.info("Ssseion key not found, creating new one {} ",
+					// sessionKey);
 				} else {
-					logger.info("Ssseion key found {}", sessionKey);
+					// logger.info("Ssseion key found {}", sessionKey);
 					session = sessionBackend.get(sessionKey);
 					if (session == null) {
 						session = new Session(sessionBackend);
@@ -117,7 +121,8 @@ public class MainHTTPHandler extends AbstractHandler {
 						Cookie cookie = new Cookie(SESSION_HEADER_NAME, sessionKey);
 						foundCookie.setMaxAge(0);
 						response.addCookie(cookie);
-						logger.info("Ssseion id could not be found adding new key {}", sessionKey);
+						// logger.info("Ssseion id could not be found adding new key {}",
+						// sessionKey);
 					}
 				}
 
@@ -170,6 +175,15 @@ public class MainHTTPHandler extends AbstractHandler {
 					} else if (result instanceof File) {
 						fileTransformer.transform(req, res, (File) result);
 					} else if (result instanceof InputStream) {
+
+					} else if (result instanceof Message) {
+						Message message = (Message) result;
+						response.setContentType(ContentType.JSON);
+						response.setStatus(message.getCode());
+
+						Gson gson = new Gson();
+						String jsonStr = gson.toJson(result);
+						stringTransformer.transform(req, res, jsonStr);
 
 					} else if (result instanceof Object) {
 						Gson gson = new Gson();
