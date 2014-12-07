@@ -3,7 +3,7 @@ package webom.request;
 import webom.response.Response;
 
 public abstract class HTTPRequestHandler extends POJOBuilder {
-	public abstract Object handle(Request request, Response response);
+	public abstract Object handle(Request request, Response response) throws Exception;
 
 	// The method that can be overridden to alter failing state
 	public Object before() {
