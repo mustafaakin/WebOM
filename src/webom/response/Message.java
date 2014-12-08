@@ -24,8 +24,8 @@ public class Message {
 	public static Message InternalError() {
 		return new Message(500, "An internal error has occured");
 	}
-	
+
 	public static Message NotFound() {
-		return new Message(404, "The requested content could not be found");		
+		return new Message(404, "The requested content could not be found");
 	}
 }

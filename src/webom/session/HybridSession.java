@@ -10,11 +10,11 @@ import org.slf4j.LoggerFactory;
 public class HybridSession implements SessionBackend {
 	final static Logger logger = LoggerFactory.getLogger(HybridSession.class);
 	private final String path;
-	private HashMap<String,Session> map = new HashMap<>();
+	private HashMap<String, Session> map = new HashMap<>();
 
 	// TODO: Periodically save to file, upon creating, load from file..
 	public HybridSession(String path) {
-		
+
 		this.path = path;
 		File root = new File(path);
 		try {

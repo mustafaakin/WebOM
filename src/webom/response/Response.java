@@ -2,7 +2,6 @@ package webom.response;
 
 import javax.servlet.http.HttpServletResponse;
 
-import webom.util.ContentType;
 import webom.util.HTTPStatus;
 
 public class Response {

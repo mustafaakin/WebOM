@@ -1,5 +1,4 @@
 import webom.core.WebOM;
-import webom.session.InMemorySession;
 import webom.session.RedisJSONSession;
 
 public class Test {

@@ -9,5 +9,6 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Mapper {
 	Class<?> cls();
-	String method() default "get";	
+
+	String method() default "get";
 }

@@ -1,7 +1,5 @@
 package webom.core;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -13,7 +11,6 @@ import org.eclipse.jetty.server.HttpConnectionFactory;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.handler.HandlerCollection;
-import org.eclipse.jetty.server.session.HashSessionManager;
 import org.eclipse.jetty.websocket.server.WebSocketHandler;
 import org.eclipse.jetty.websocket.servlet.ServletUpgradeRequest;
 import org.eclipse.jetty.websocket.servlet.ServletUpgradeResponse;
@@ -130,8 +127,6 @@ public class WebOM {
 		// Initialize Main HTTP handler that will respond to anything
 		MainHTTPHandler http = new MainHTTPHandler(this);
 
-		
-		
 		handlerCollection.addHandler(http);
 
 		final WebOM w = this;
@@ -162,9 +157,9 @@ public class WebOM {
 			HttpConfiguration httpConfig = new HttpConfiguration();
 			httpConfig.setSendServerVersion(false);
 			HttpConnectionFactory httpFactory = new HttpConnectionFactory(httpConfig);
-			
+
 			Server server = new Server();
-			
+
 			ServerConnector httpConnector = new ServerConnector(server, httpFactory);
 			httpConnector.setPort(port);
 

@@ -195,8 +195,8 @@ public class MainHTTPHandler extends AbstractHandler {
 				}
 
 				// If it is not modified don't try to save it back
-				if ( session.isDirty()){
-					session.save();					
+				if (session.isDirty()) {
+					session.save();
 				}
 
 				long endTime = System.nanoTime();
