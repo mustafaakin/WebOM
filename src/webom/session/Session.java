@@ -11,6 +11,7 @@ public class Session {
 	private String key;
 	private boolean destoryCalled = false;
 	private SessionBackend backend;
+	private boolean dirty = false;
 
 	private HashMap<String, Object> map = new HashMap<>();
 
@@ -55,7 +56,12 @@ public class Session {
 	}
 
 	public void put(String key, Object object) {
+		dirty = true;
 		map.put(key, object);
+	}
+
+	public boolean isDirty() {
+		return dirty;
 	}
 
 	public void save() {

@@ -194,10 +194,10 @@ public class MainHTTPHandler extends AbstractHandler {
 					}
 				}
 
-				// If it is not modified, it is up to SessionBackend to
-				// decide
-				// if actually update or leave it as it is
-				session.save();
+				// If it is not modified don't try to save it back
+				if ( session.isDirty()){
+					session.save();					
+				}
 
 				long endTime = System.nanoTime();
 				double diff = (endTime / 1000000.0 - startTime / 1000000.0);
