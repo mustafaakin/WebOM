@@ -28,4 +28,16 @@ public class Message {
 	public static Message NotFound() {
 		return new Message(404, "The requested content could not be found");
 	}
+	
+	public static Message AuthError(String message) {
+		return new Message(401, message);
+	}
+
+	public static Message InternalError(String message) {
+		return new Message(500, message);
+	}
+
+	public static Message NotFound(String message) {
+		return new Message(404, message);
+	}
 }
