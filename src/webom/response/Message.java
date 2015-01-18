@@ -28,6 +28,10 @@ public class Message {
 	public static Message NotFound() {
 		return new Message(404, "The requested content could not be found");
 	}
+
+	public static Message BadReqError(){
+		return new Message(400, "The server cannot or will not process the request due to something that is perceived to be a client error.");
+	}
 	
 	public static Message AuthError(String message) {
 		return new Message(401, message);
@@ -40,4 +44,10 @@ public class Message {
 	public static Message NotFound(String message) {
 		return new Message(404, message);
 	}
+	
+	public static Message BadReqError(String message){
+		return new Message(400, message);
+	}
+	
+
 }
