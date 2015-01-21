@@ -17,6 +17,10 @@ public class Message {
 		return message;
 	}
 
+	public static Message OK() {
+		return new Message(200, "OK");
+	}
+	
 	public static Message AuthError() {
 		return new Message(401, "You are not allowed to see here");
 	}
