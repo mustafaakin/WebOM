@@ -27,6 +27,10 @@ public class KeyValueWSExample extends KeyValueWebSocketHandler{
 	public void onWebSocketConnect() {
 		logger.info("Websocket connected");
 		super.onWebSocketConnect();
+		Person p = new Person();
+		p.age = 24;
+		p.name = "Mustafa";
+		sendJSON("myperson", p);
 	}
 
 	@Override
