@@ -12,11 +12,7 @@ import webom.request.KeyValueWebSocketHandler;
 public class KeyValueWSExample extends KeyValueWebSocketHandler{
 
 	private static Logger logger = LoggerFactory.getLogger(KeyValueWSExample.class);
-
-	@Override
-	public void onWebSocketBinary(byte[] payload, int offset, int len) {
-
-	}
+ 
 
 	@Override
 	public void onWebSocketClose(int statusCode, String reason) {

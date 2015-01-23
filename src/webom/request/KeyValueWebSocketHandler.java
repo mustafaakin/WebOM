@@ -28,11 +28,6 @@ public abstract class KeyValueWebSocketHandler extends WebSocketHandler {
 	}
 
 	@Override
-	public void onWebSocketError(Throwable cause) {
-
-	}
-
-	@Override
 	public void onWebSocketText(String message) {
 		// Parse the JSON message
 		try {
@@ -54,11 +49,24 @@ public abstract class KeyValueWebSocketHandler extends WebSocketHandler {
 
 		} catch (Exception ex) {
 			// Invalid json
+			// Extend these exceptions for others
 			onUnknownWebSocketText(message);
-			ex.printStackTrace();
 		}
 	}
 
 	public abstract void onUnknownWebSocketText(String message);
+	
+	@Override
+	public void onWebSocketBinary(byte[] payload, int offset, int len) {
+	
+	}
+	
+	@Override
+	public void onWebSocketClose(int statusCode, String reason) {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	
 
 }
