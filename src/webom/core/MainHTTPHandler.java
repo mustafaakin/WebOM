@@ -62,8 +62,9 @@ public class MainHTTPHandler extends AbstractHandler {
 					long endTime = System.nanoTime();
 					double diff = (endTime / 1000000.0 - startTime / 1000000.0);
 
-					logger.info("{} {} {} {} ms", baseRequest.getMethod(), target, res.getRaw().getStatus(),
-							String.format("%.2f", diff));
+					// logger.info("{} {} {} {} ms", baseRequest.getMethod(),
+					// target, res.getRaw().getStatus(),
+					// String.format("%.2f", diff));
 					baseRequest.setHandled(true);
 					return;
 				}

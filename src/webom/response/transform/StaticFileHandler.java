@@ -14,13 +14,14 @@ public class StaticFileHandler {
 		JADE
 	}
 
-	private JadeConfiguration config = new JadeConfiguration();
+	private final JadeConfiguration config = new JadeConfiguration();
 	private final static Map<String, Object> emptyMap = new HashMap<String, Object>();
 	private Template template;
 
 	private File root;
 
 	public StaticFileHandler(String path, Template template) {
+		config.setPrettyPrint(true);
 		this.template = template;
 		root = new File(path);
 		if (!root.isDirectory()) {
@@ -31,17 +32,21 @@ public class StaticFileHandler {
 
 	public File getFile(String path) throws Exception {
 		// TODO: Path traversal check
+		if ( path.equals("/")){
+			path = "index.html";
+		}
 		File requestedFile = new File(root, path);
 		if (template != null && (path.endsWith(".htm") || path.endsWith(".html"))) {
+			String name = path.substring(0, path.lastIndexOf("."));
+
 			if (template == Template.JADE) {
-				String name = path.substring(0, path.lastIndexOf("."));
-
 				File jadeFile = new File(root, name + ".jade");
-
-				JadeTemplate jadeTemplate = config.getTemplate(jadeFile.getAbsolutePath());
-				String html = config.renderTemplate(jadeTemplate, emptyMap);
-				// TODO: Add my own caching later
-				FileUtils.writeStringToFile(requestedFile, html);
+				if (jadeFile.exists()) {
+					JadeTemplate jadeTemplate = config.getTemplate(jadeFile.getAbsolutePath());
+					String html = config.renderTemplate(jadeTemplate, emptyMap);
+					// TODO: Add my own caching later
+					FileUtils.writeStringToFile(requestedFile, html);
+				}
 			}
 		}
 		return requestedFile;
