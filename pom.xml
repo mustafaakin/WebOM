@@ -18,6 +18,7 @@
 		</plugins>
 	</build>
 	<dependencies>
+
 		<dependency>
 			<groupId>org.eclipse.jetty</groupId>
 			<artifactId>jetty-server</artifactId>
@@ -85,5 +86,11 @@
 			<type>jar</type>
 			<scope>compile</scope>
 		</dependency>
+		<dependency>
+			<groupId>de.neuland-bfi</groupId>
+			<artifactId>jade4j</artifactId>
+			<version>0.4.0</version>
+		</dependency>
+
 	</dependencies>
 </project>

@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
 import webom.annotations.request.Handler;
 import webom.annotations.request.RequestMethod;
 import webom.response.transform.StaticFileHandler;
+import webom.response.transform.StaticFileHandler.Template;
 import webom.session.InMemorySession;
 import webom.session.SessionBackend;
 
@@ -117,8 +118,8 @@ public class WebOM {
 		this.session = session;
 	}
 
-	public void setStaticFileLocation(String path) {
-		this.staticFileHandler = new StaticFileHandler(path);
+	public void setStaticFileLocation(String path, Template template) {
+		this.staticFileHandler = new StaticFileHandler(path, template);
 	}
 
 	public void start() {
