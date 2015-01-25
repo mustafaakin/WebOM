@@ -274,6 +274,8 @@ public abstract class POJOBuilder {
 				field.set(this, Integer.parseInt(value));
 			} else if (fieldCls.equals(Double.class)) {
 				field.set(this, Double.parseDouble(value));
+			} else if (fieldCls.equals(Long.class)) {
+				field.set(this, Long.parseLong(value));
 			} else {
 				// TODO: all the types, or non parsable things Handle
 				// later
