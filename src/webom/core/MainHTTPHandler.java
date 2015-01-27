@@ -62,9 +62,8 @@ public class MainHTTPHandler extends AbstractHandler {
 					long endTime = System.nanoTime();
 					double diff = (endTime / 1000000.0 - startTime / 1000000.0);
 
-					// logger.info("{} {} {} {} ms", baseRequest.getMethod(),
-					// target, res.getRaw().getStatus(),
-					// String.format("%.2f", diff));
+					logger.info("{} {} {} {} ms", baseRequest.getMethod(), target, res.getRaw().getStatus(),
+							String.format("%.2f", diff));
 					baseRequest.setHandled(true);
 					return;
 				}
@@ -73,6 +72,10 @@ public class MainHTTPHandler extends AbstractHandler {
 			// HTTP Cross origin, cors, csrf etc
 			Route route = webom.findMatchingRoute(target, baseRequest.getMethod());
 			if (route == null) {
+				// Try to find a Websocket for that, we must hand over the connection to there, there should not be a 404
+				if (webom.findMatchingRoute(target, "WEBSOCKET") != null) {
+					return;
+				}
 				response.setStatus(HTTPStatus.NOT_FOUND);
 				response.getWriter().println("Content not found, sorry.");
 				long endTime = System.nanoTime();

@@ -128,7 +128,7 @@ public class WebOM {
 		// Initialize Main HTTP handler that will respond to anything
 		MainHTTPHandler http = new MainHTTPHandler(this);
 
-		handlerCollection.addHandler(http);
+
 
 		final WebOM w = this;
 		// Initialize Main Web Socket handler that will respond to anything
@@ -152,8 +152,10 @@ public class WebOM {
 			}
 
 		};
+		
 		handlerCollection.addHandler(wsHandler);
-
+		handlerCollection.addHandler(http);
+		
 		try {
 			HttpConfiguration httpConfig = new HttpConfiguration();
 			httpConfig.setSendServerVersion(false);

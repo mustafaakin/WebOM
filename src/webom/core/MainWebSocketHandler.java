@@ -7,11 +7,15 @@ import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.UpgradeRequest;
 import org.eclipse.jetty.websocket.api.UpgradeResponse;
 import org.eclipse.jetty.websocket.api.WebSocketListener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import webom.annotations.request.RequestMethod;
 import webom.request.WebSocketHandler;
 
 public class MainWebSocketHandler implements WebSocketListener {
+	private static final Logger logger = LoggerFactory.getLogger(MainWebSocketHandler.class);
+
 	Session session;
 	WebSocketHandler handler;
 	WebOM w;
@@ -42,6 +46,7 @@ public class MainWebSocketHandler implements WebSocketListener {
 		}
 
 		this.session = session;
+		
 
 		UpgradeRequest req = session.getUpgradeRequest();
 		UpgradeResponse res = session.getUpgradeResponse();
@@ -61,6 +66,7 @@ public class MainWebSocketHandler implements WebSocketListener {
 				Map<String, List<String>> queryMap = req.getParameterMap();
 
 				// TODO: Also Get the session params
+				logger.info("Websocket request for {} will be handled by {}", path, routeCls);				
 				handler.buildWebsocket(urlParams, queryMap, null);
 
 				handler.onWebSocketConnect();
