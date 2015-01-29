@@ -107,6 +107,8 @@ public abstract class POJOBuilder {
 					field.set(this, json.getInt(name));
 				} else if (cls.equals(Double.class)) {
 					field.set(this, json.getDouble(name));
+				} else if ( cls.equals(Boolean.class)){
+					field.set(this, json.getBoolean(name));
 				} else {
 					throw new IllegalArgumentException("I just don't know how to put this class:" + cls.getName());
 				}
@@ -276,6 +278,8 @@ public abstract class POJOBuilder {
 				field.set(this, Double.parseDouble(value));
 			} else if (fieldCls.equals(Long.class)) {
 				field.set(this, Long.parseLong(value));
+			} else if ( fieldCls.equals(Boolean.class)){
+				field.set(this, Boolean.parseBoolean(value));
 			} else {
 				// TODO: all the types, or non parsable things Handle
 				// later
