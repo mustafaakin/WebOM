@@ -55,7 +55,7 @@ public abstract class POJOBuilder {
 					IOUtils.copy(body, str);
 					Class<?> fieldCls = field.getType();
 					Gson gson = new Gson();
-					logger.info(str.toString());
+					// logger.info(str.toString());
 					Object obj = gson.fromJson(str.toString(), fieldCls);
 					field.set(this, obj);
 				} catch (Exception ex) {
