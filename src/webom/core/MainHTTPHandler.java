@@ -46,8 +46,7 @@ public class MainHTTPHandler extends AbstractHandler {
 	}
 
 	@Override
-	public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response)
-			throws IOException, ServletException {
+	public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 		long startTime = System.nanoTime();
 		try {
 			// Serve the static file if it exists, Session-less
@@ -62,8 +61,7 @@ public class MainHTTPHandler extends AbstractHandler {
 					long endTime = System.nanoTime();
 					double diff = (endTime / 1000000.0 - startTime / 1000000.0);
 
-					logger.info("{} {} {} {} ms", baseRequest.getMethod(), target, res.getRaw().getStatus(),
-							String.format("%.2f", diff));
+					logger.info("{} {} {} {} ms", baseRequest.getMethod(), target, res.getRaw().getStatus(), String.format("%.2f", diff));
 					baseRequest.setHandled(true);
 					return;
 				}
@@ -72,7 +70,8 @@ public class MainHTTPHandler extends AbstractHandler {
 			// HTTP Cross origin, cors, csrf etc
 			Route route = webom.findMatchingRoute(target, baseRequest.getMethod());
 			if (route == null) {
-				// Try to find a Websocket for that, we must hand over the connection to there, there should not be a 404
+				// Try to find a Websocket for that, we must hand over the
+				// connection to there, there should not be a 404
 				if (webom.findMatchingRoute(target, "WEBSOCKET") != null) {
 					return;
 				}
@@ -80,8 +79,7 @@ public class MainHTTPHandler extends AbstractHandler {
 				response.getWriter().println("Content not found, sorry.");
 				long endTime = System.nanoTime();
 				double diff = (endTime / 1000000.0 - startTime / 1000000.0);
-				logger.info("{} {} {} {} ms", baseRequest.getMethod(), target, HTTPStatus.NOT_FOUND,
-						String.format("%.2f", diff));
+				logger.info("{} {} {} {} ms", baseRequest.getMethod(), target, HTTPStatus.NOT_FOUND, String.format("%.2f", diff));
 			} else {
 				// Find out the class of the handler which should be a request
 				// handler
@@ -204,9 +202,9 @@ public class MainHTTPHandler extends AbstractHandler {
 
 				long endTime = System.nanoTime();
 				double diff = (endTime / 1000000.0 - startTime / 1000000.0);
-				logger.info("{} {} {} {} ms", baseRequest.getMethod(), target, res.getRaw().getStatus(),
-						String.format("%.2f", diff));
+				logger.info("{} {} {} {} ms", baseRequest.getMethod(), target, res.getRaw().getStatus(), String.format("%.2f", diff));
 
+				Reporter.path(target, route.path, routeCls.getName(), diff, response.getStatus());
 			}
 			baseRequest.setHandled(true);
 		} catch (Exception ex) {
@@ -226,8 +224,7 @@ public class MainHTTPHandler extends AbstractHandler {
 			long endTime = System.nanoTime();
 			double diff = (endTime / 1000000.0 - startTime / 1000000.0);
 			// Better error reporting
-			logger.info("{} {} {} {} ms #Error: {}", baseRequest.getMethod(), target, HTTPStatus.INTERNAL_SERVER_ERROR,
-					String.format("%.2f", diff), ex.getMessage());
+			logger.info("{} {} {} {} ms #Error: {}", baseRequest.getMethod(), target, HTTPStatus.INTERNAL_SERVER_ERROR, String.format("%.2f", diff), ex.getMessage());
 			baseRequest.setHandled(true);
 		}
 	}

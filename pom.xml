@@ -30,7 +30,11 @@
 			<artifactId>websocket-api</artifactId>
 			<version>9.2.5.v20141112</version>
 		</dependency>
-
+		<dependency>
+			<groupId>org.influxdb</groupId>
+			<artifactId>influxdb-java</artifactId>
+			<version>1.5</version>
+		</dependency>
 		<!-- To run websockets in embedded server -->
 		<dependency>
 			<groupId>org.eclipse.jetty.websocket</groupId>
